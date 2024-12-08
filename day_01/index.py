@@ -66,3 +66,4 @@ def main(file_name):
 if __name__ == "__main__":
     
     main(os.path.join(os.path.dirname(__file__), "input.txt"))
+    
