@@ -15,52 +15,62 @@ def load(file_name):
     return grid
 
 
+def check_xmas_at_position(file, row, col, d_row, d_col, rows, cols):
+    if not (0 <= row + 3*d_row < rows and 0 <= col + 3*d_col < cols):
+        return False
+    
+    chars = [file[row + i*d_row][col + i*d_col] for i in range(4)]
+    return chars == ['X','M','A','S']
+
 def part_1(file):
     print("Day 2, Part 1")
-
-    # Initialize count of XMAS occurrences
     xmas_count = 0
-    rows = len(file)
-    cols = len(file[0])
+    rows, cols = len(file), len(file[0])
     
-    # Define all 8 possible directions to search
     directions = [
-        (-1,-1), (-1,0), (-1,1),  # Up-left, Up, Up-right
-        (0,-1),          (0,1),   # Left, Right
-        (1,-1),  (1,0),  (1,1)    # Down-left, Down, Down-right
+        (-1,-1), (-1,0), (-1,1),
+        (0,-1),          (0,1),
+        (1,-1),  (1,0),  (1,1)
     ]
     
-    # For each starting position in grid
     for row in range(rows):
         for col in range(cols):
-            # Try each direction from this position
-            for d_row, d_col in directions:
-                # Check if XMAS can fit in this direction from here
-                if (0 <= row + 3*d_row < rows and 
-                    0 <= col + 3*d_col < cols):
-                    
-                    # Get the 4 characters in this direction
-                    chars = [
-                        file[row + i*d_row][col + i*d_col] 
-                        for i in range(4)
-                    ]
-                    
-                    # Check if they spell XMAS
-                    if chars == ['X','M','A','S']:
-                        xmas_count += 1
+            xmas_count += sum(
+                check_xmas_at_position(file, row, col, d_row, d_col, rows, cols)
+                for d_row, d_col in directions
+            )
                         
     print(f"\n Instances of XMAS found: {xmas_count} ")
 
-   
+def check_x_pattern(file, row, col, rows, cols):
+    if file[row][col] != 'A':
+        return False
+        
+    diagonals = [(-1,-1), (-1,1), (1,-1), (1,1)]
+    
+    # Check bounds
+    for d_row, d_col in diagonals:
+        if not (0 <= row + d_row < rows and 0 <= col + d_col < cols):
+            return False
+            
+    # Get characters in both diagonals
+    diag1 = [file[row + diagonals[0][0]][col + diagonals[0][1]],
+             file[row + diagonals[3][0]][col + diagonals[3][1]]]
+    diag2 = [file[row + diagonals[1][0]][col + diagonals[1][1]],
+             file[row + diagonals[2][0]][col + diagonals[2][1]]]
+             
+    return ('M' in diag1 and 'S' in diag1 and 
+            'M' in diag2 and 'S' in diag2)
 
 def part_2(file):
     print("Day 2, Part 2")
-
-    # Initialize count of X-shaped MAS occurrences
-    mas_x_count = 0
-  
-                        
-    print(f"\n X-shaped MAS patterns found: {mas_x_count}")
+    rows, cols = len(file), len(file[0])
+    x_mas_count = sum(
+        check_x_pattern(file, row, col, rows, cols)
+        for row in range(rows)
+        for col in range(cols)
+    )
+    print(f"\n X-shaped MAS patterns found: {x_mas_count}")
 
 
 def main(file_name):
@@ -70,5 +80,5 @@ def main(file_name):
     part_2(grid)
 
 if __name__ == "__main__":
-    main(os.path.join(os.path.dirname(__file__), "test.txt"))
+    main(os.path.join(os.path.dirname(__file__), "input.txt"))
     
